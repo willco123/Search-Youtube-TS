@@ -1,2 +1,4 @@
-import express from "express";
-export const app = express();
+import app from "./config/routes";
+import "./config/db";
+
+export default app;

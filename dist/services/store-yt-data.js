@@ -8,25 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const router = express_1.default.Router();
-const yt_data_api_1 = require("../services/yt-data-api");
-router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield (0, yt_data_api_1.getSearchResults)();
-        return res.status(200).send("Items stored in DB!");
-    }
-    catch (err) {
-        if (err.code == 403) {
-            res.status(403).send("Forbidden, Quota exceeded");
+exports.storeData = void 0;
+const db_queries_1 = require("../database-access/db-queries");
+function storeData(dataYT) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let id;
+        try {
+            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
+                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(channelTitle);
+                id = uniquenessValue
+                    ? uniquenessValue
+                    : yield (0, db_queries_1.insertIntoChannelsReturnID)(channelTitle);
+                yield (0, db_queries_1.insertIntoVideos)(title, date, id);
+            })));
         }
-        else {
-            next(err);
+        catch (err) {
+            throw err;
         }
-    }
-}));
-exports.default = router;
+    });
+}
+exports.storeData = storeData;

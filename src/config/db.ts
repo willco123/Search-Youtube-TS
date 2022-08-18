@@ -12,14 +12,13 @@ const pool = mysql.createPool({
 });
 
 const promisePool = pool.promise();
-//do ternary
-async function createSchema() {
+async function createSchema(): Promise<void> {
   try {
     let targetFile: string;
     process.env.NODE_ENV === "test"
       ? (targetFile = "./MYSQL_Schema_test.sql")
       : (targetFile = "./MYSQL_Schema.sql");
-    const SQLSchema = fs.readFileSync(targetFile, {
+    const SQLSchema: string = fs.readFileSync(targetFile, {
       encoding: "utf8",
     });
     await promisePool.query(SQLSchema);

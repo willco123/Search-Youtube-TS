@@ -47,7 +47,6 @@ const pool = mysql.createPool({
     multipleStatements: true,
 });
 const promisePool = pool.promise();
-//do ternary
 function createSchema() {
     return __awaiter(this, void 0, void 0, function* () {
         try {

@@ -58,6 +58,7 @@ function createSchema() {
                 encoding: "utf8",
             });
             yield promisePool.query(SQLSchema);
+            yield promisePool.query("USE `YTSearchDB` ;");
         }
         catch (err) {
             throw err;

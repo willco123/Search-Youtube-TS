@@ -12,13 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const googleapis_1 = require("googleapis");
 const store_yt_data_1 = require("./store-yt-data");
 const search_model_1 = require("../utils/search-model");
-;
 const apiKey = process.env.MYAPIKEY;
 const youtube = googleapis_1.google.youtube({
     version: "v3",
     auth: apiKey,
 });
-function queryRecur(numberOfPages, response, nextPage) {
+function appendPages(numberOfPages, response, nextPage) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //if here
@@ -54,7 +53,7 @@ function queryYoutube(searchParams) {
             const resultsPerPage = response.data.pageInfo.resultsPerPage;
             const numberOfPages = Math.floor(totalResults / resultsPerPage);
             var nextPage = response.data.nextPageToken;
-            yield queryRecur(numberOfPages, response, nextPage);
+            yield appendPages(numberOfPages, response, nextPage);
             delete searchParams.pageToken;
         }
         catch (err) {
@@ -71,7 +70,7 @@ function getSearchResults() {
     return __awaiter(this, void 0, void 0, function* () {
         //All phrases in string have to be in title
         for (let i in search_model_1.searchArray) {
-            searchQuery = "allintitle:" + search_model_1.searchArray[i];
+            const searchQuery = "allintitle:" + search_model_1.searchArray[i];
             search_model_1.searchParams.q = searchQuery;
             yield queryYoutube(search_model_1.searchParams);
         }
@@ -82,7 +81,7 @@ function getSearchResultsSpecific() {
     return __awaiter(this, void 0, void 0, function* () {
         //Has to match the phrase exactly in order
         for (let i in search_model_1.searchArray) {
-            searchQuery = 'intitle:"' + search_model_1.searchArray[i] + '"';
+            const searchQuery = 'intitle:"' + search_model_1.searchArray[i] + '"';
             search_model_1.searchParams.q = searchQuery;
             yield queryYoutube(search_model_1.searchParams);
         }

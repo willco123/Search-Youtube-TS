@@ -13,15 +13,19 @@ exports.storeData = void 0;
 const db_queries_1 = require("../database-access/db-queries");
 function storeData(dataYT) {
     return __awaiter(this, void 0, void 0, function* () {
-        let id;
+        let channel_id;
+        const table = "channels";
+        const column = "channel_name";
+        console.log(dataYT);
         try {
-            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
-                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(channelTitle);
-                id = uniquenessValue
+            for (let index in dataYT) {
+                const { title, date, channelTitle } = dataYT[index];
+                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channelTitle);
+                channel_id = uniquenessValue
                     ? uniquenessValue
                     : yield (0, db_queries_1.insertIntoChannelsReturnID)(channelTitle);
-                yield (0, db_queries_1.insertIntoVideos)(title, date, id);
-            })));
+                yield (0, db_queries_1.insertIntoVideos)(title, date, channel_id);
+            }
         }
         catch (err) {
             throw err;
@@ -29,3 +33,19 @@ function storeData(dataYT) {
     });
 }
 exports.storeData = storeData;
+// const doLogic = async ({ title, date, channelTitle }) => {
+//   const uniquenessValue: number = await checkUniqueness(
+//     table,
+//     column,
+//     channelTitle,
+//   );
+//   channel_id = uniquenessValue
+//     ? uniquenessValue
+//     : await insertIntoChannelsReturnID(channelTitle);
+//   await insertIntoVideos(title, date, channel_id);
+// };
+// await Promise.all(
+//   dataYT.map(async ({ title, date, channelTitle }) =>
+//     doLogic({ title, date, channelTitle }),
+//   ),
+// );

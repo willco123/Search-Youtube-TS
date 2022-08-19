@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import { getSearchResults } from "../services/yt-data-api";
+import getSearchResults from "../services/yt-data-api";
 
 router.get("/", async (_req, res, next) => {
   try {

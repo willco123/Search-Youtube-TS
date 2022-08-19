@@ -12,44 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getChildItemsWithFK = exports.getParentItemsByFK = exports.searchDBFromTable = exports.deleteItemByIDFromTable = exports.getItemByIDFromTable = exports.getAllFromTable = exports.checkUniqueness = exports.insertIntoVideos = exports.insertIntoChannelsReturnID = exports.storeData = void 0;
+exports.getChildItemsWithFK = exports.getParentItemsByFK = exports.searchDBFromTable = exports.deleteItemByIDFromTable = exports.getItemByIDFromTable = exports.getAllFromTable = exports.checkUniqueness = exports.insertIntoVideos = exports.insertIntoChannelsReturnID = void 0;
 const db_1 = __importDefault(require("../config/db"));
-// const isRowDataPacket = (
-//   rows:
-//     | RowDataPacket[]
-//     | RowDataPacket[][]
-//     | OkPacket
-//     | OkPacket[]
-//     | ResultSetHeader,
-// ): rows is RowDataPacket[] | RowDataPacket[][] => {
-//   return (rows as RowDataPacket[] | RowDataPacket[][])[0] !== undefined;
-// };
-function storeData(dataYT) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let id;
-        try {
-            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
-                const table = "channels";
-                const column = "channel_name";
-                const uniquenessValue = yield checkUniqueness(table, column, channelTitle);
-                id = uniquenessValue
-                    ? uniquenessValue
-                    : yield insertIntoChannelsReturnID(channelTitle);
-                yield insertIntoVideos(title, date, id);
-            })));
-        }
-        catch (err) {
-            throw err;
-        }
-    });
-}
-exports.storeData = storeData;
+const type_guarding_helper_1 = require("../utils/type-guarding-helper");
 function insertIntoChannelsReturnID(channelTitle) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let [result] = yield db_1.default.query("INSERT INTO CHANNELS(channel_name)\
+            let [query] = yield db_1.default.query("INSERT INTO CHANNELS(channel_name)\
                       VALUES (?)", [channelTitle]);
-            const idAlias = result;
+            const idAlias = query;
             return idAlias.insertId; //fixes trivial type checking error
         }
         catch (err) {
@@ -72,17 +43,15 @@ function insertIntoVideos(title, date, id) {
 exports.insertIntoVideos = insertIntoVideos;
 function checkUniqueness(table, column, value) {
     return __awaiter(this, void 0, void 0, function* () {
+        // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
         try {
-            const [selectItem] = yield db_1.default.query("SELECT * from ?? where (??) = (?)", [
+            const [query] = yield db_1.default.query("SELECT * from ?? where (??) = (?)", [
                 table,
                 column,
                 value,
             ]);
-            const rowAlias = selectItem[0];
-            const row = rowAlias;
-            if (row === undefined)
-                return 0;
-            return row.id;
+            const [item] = Object.values(JSON.parse(JSON.stringify(query))); //hacky method to fix mysql2 no id prop error
+            return item === undefined ? 0 : item.id;
         }
         catch (err) {
             throw err;
@@ -92,31 +61,29 @@ function checkUniqueness(table, column, value) {
 exports.checkUniqueness = checkUniqueness;
 function getAllFromTable(table) {
     return __awaiter(this, void 0, void 0, function* () {
-        const items = yield db_1.default.query("SELECT * from ??", [table]);
-        return items[0];
+        const query = yield db_1.default.query("SELECT * from ??", [table]);
+        const items = query[0];
+        return items;
     });
 }
 exports.getAllFromTable = getAllFromTable;
 function getItemByIDFromTable(table, id) {
     return __awaiter(this, void 0, void 0, function* () {
-        const [query] = yield db_1.default.query("SELECT * from ?? WHERE (id) = (?)", [
-            table,
-            id,
-        ]);
-        if (Array.isArray(query)) {
-            const item = query[0];
-            console.log(item);
-            console.log("hery");
+        try {
+            const [query] = yield db_1.default.query("SELECT * from ?? WHERE (id) = (?)", [
+                table,
+                id,
+            ]);
+            return Array.isArray(query) ? query[0] : 0;
         }
-        const [item] = Object.values(JSON.parse(JSON.stringify(query))); //hacky method to fix type indexing issue with intrinsic mysql types
-        console.log(item);
-        return item === undefined ? 0 : item;
+        catch (err) {
+            throw err;
+        }
     });
 }
 exports.getItemByIDFromTable = getItemByIDFromTable;
 function deleteItemByIDFromTable(table, id) {
     return __awaiter(this, void 0, void 0, function* () {
-        //returns bool
         const [deletedItem] = yield db_1.default.query("DELETE FROM ?? WHERE id = (?)", [
             table,
             id,
@@ -147,7 +114,7 @@ function getParentItemsByFK(parentTable, parentColumn, fk) {
             parentTable,
             fk,
         ]);
-        const parentItem = query[0];
+        const parentItem = (0, type_guarding_helper_1.arrayTypeGuard)(query);
         return parentItem[parentColumn];
     });
 }
@@ -159,10 +126,10 @@ function getChildItemsWithFK(childTable, childColumn, fk) {
             childTable,
             fk,
         ]);
+        console.log(query);
         const childItems = query;
         const childValues = [];
-        for (let key of childItems)
-            childValues.push(key[childColumn]);
+        return childItems.map((key) => key[childColumn]);
         return childValues;
     });
 }

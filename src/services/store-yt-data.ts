@@ -4,20 +4,51 @@ import {
   checkUniqueness,
 } from "../database-access/db-queries";
 
-export async function storeData(dataYT: dataYT[]): Promise<void> {
-  let id: number;
-  try {
-    await Promise.all(
-      dataYT.map(async ({ title, date, channelTitle }) => {
-        const uniquenessValue: number = await checkUniqueness(channelTitle);
-        id = uniquenessValue
-          ? uniquenessValue
-          : await insertIntoChannelsReturnID(channelTitle);
+interface dataYT {
+  title: string;
+  date: Date;
+  channelTitle: string;
+  id?: number;
+}
 
-        await insertIntoVideos(title, date, id);
-      }),
-    );
+export async function storeData(dataYT: dataYT[]): Promise<void> {
+  let channel_id: number;
+  const table: string = "channels";
+  const column: string = "channel_name";
+  console.log(dataYT);
+  try {
+    for (let index in dataYT) {
+      const { title, date, channelTitle } = dataYT[index];
+      const uniquenessValue: number = await checkUniqueness(
+        table,
+        column,
+        channelTitle,
+      );
+
+      channel_id = uniquenessValue
+        ? uniquenessValue
+        : await insertIntoChannelsReturnID(channelTitle);
+      await insertIntoVideos(title, date, channel_id);
+    }
   } catch (err) {
     throw err;
   }
 }
+
+// const doLogic = async ({ title, date, channelTitle }) => {
+//   const uniquenessValue: number = await checkUniqueness(
+//     table,
+//     column,
+//     channelTitle,
+//   );
+//   channel_id = uniquenessValue
+//     ? uniquenessValue
+//     : await insertIntoChannelsReturnID(channelTitle);
+
+//   await insertIntoVideos(title, date, channel_id);
+// };
+// await Promise.all(
+//   dataYT.map(async ({ title, date, channelTitle }) =>
+//     doLogic({ title, date, channelTitle }),
+//   ),
+// );

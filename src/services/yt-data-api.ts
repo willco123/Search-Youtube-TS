@@ -1,7 +1,7 @@
-import {google} from "googleapis"
+import { google } from "googleapis";
 import { storeData } from "./store-yt-data";
 
-import { searchParams, searchArray } from "../utils/search-model");
+import { searchParams, searchArray } from "../utils/search-model";
 
 const apiKey = process.env.MYAPIKEY;
 const youtube = google.youtube({
@@ -9,7 +9,7 @@ const youtube = google.youtube({
   auth: apiKey,
 });
 
-async function queryRecur(numberOfPages, response, nextPage) {
+async function appendPages(numberOfPages, response, nextPage) {
   try {
     //if here
 
@@ -50,7 +50,7 @@ async function queryYoutube(searchParams) {
 
     var nextPage = response.data.nextPageToken;
 
-    await queryRecur(numberOfPages, response, nextPage);
+    await appendPages(numberOfPages, response, nextPage);
 
     delete searchParams.pageToken;
   } catch (err) {
@@ -65,7 +65,7 @@ async function queryYoutube(searchParams) {
 export default async function getSearchResults() {
   //All phrases in string have to be in title
   for (let i in searchArray) {
-    searchQuery = "allintitle:" + searchArray[i];
+    const searchQuery = "allintitle:" + searchArray[i];
     searchParams.q = searchQuery;
     await queryYoutube(searchParams);
   }
@@ -74,7 +74,7 @@ export default async function getSearchResults() {
 async function getSearchResultsSpecific() {
   //Has to match the phrase exactly in order
   for (let i in searchArray) {
-    searchQuery = 'intitle:"' + searchArray[i] + '"';
+    const searchQuery = 'intitle:"' + searchArray[i] + '"';
     searchParams.q = searchQuery;
     await queryYoutube(searchParams);
   }

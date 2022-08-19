@@ -22,6 +22,7 @@ async function createSchema(): Promise<void> {
       encoding: "utf8",
     });
     await promisePool.query(SQLSchema);
+    await promisePool.query("USE `YTSearchDB` ;");
   } catch (err) {
     throw err;
   }

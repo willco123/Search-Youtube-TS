@@ -44,6 +44,7 @@ exports.insertIntoVideos = insertIntoVideos;
 function checkUniqueness(table, column, value) {
     return __awaiter(this, void 0, void 0, function* () {
         // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
+        console.log("hey");
         try {
             const [query] = yield db_1.default.query("SELECT * from ?? where (??) = (?)", [
                 table,
@@ -126,11 +127,8 @@ function getChildItemsWithFK(childTable, childColumn, fk) {
             childTable,
             fk,
         ]);
-        console.log(query);
         const childItems = query;
-        const childValues = [];
         return childItems.map((key) => key[childColumn]);
-        return childValues;
     });
 }
 exports.getChildItemsWithFK = getChildItemsWithFK;

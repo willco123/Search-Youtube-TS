@@ -51,6 +51,7 @@ export async function checkUniqueness(
   value: string,
 ): Promise<number> {
   // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
+  console.log("hey");
   try {
     const [query] = await db.query("SELECT * from ?? where (??) = (?)", [
       table,
@@ -136,9 +137,6 @@ export async function getChildItemsWithFK(
     childTable,
     fk,
   ]);
-  console.log(query);
   const childItems: any = query;
-  const childValues = [];
   return childItems.map((key: any) => key[childColumn]);
-  return childValues;
 }

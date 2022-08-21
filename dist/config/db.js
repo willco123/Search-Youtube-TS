@@ -37,33 +37,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mysql = __importStar(require("mysql2"));
 const fs_1 = __importDefault(require("fs"));
+const util_1 = __importDefault(require("util"));
+let ytDatabase;
+let targetFile;
+process.env.NODE_ENV === "test"
+    ? ((targetFile = "./MYSQL_Schema_test.sql"), (ytDatabase = "ytsearchdb_test"))
+    : ((targetFile = "./MYSQL_Schema.sql"), (ytDatabase = "ytsearchdb"));
+const SQLSchema = fs_1.default.readFileSync(targetFile, {
+    encoding: "utf8",
+});
+const conn = mysql.createConnection({
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    multipleStatements: true,
+});
+const query = util_1.default.promisify(conn.query).bind(conn);
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield query(SQLSchema);
+    }
+    finally {
+        conn.end();
+    }
+}))();
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
+    database: ytDatabase,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
     multipleStatements: true,
 });
 const promisePool = pool.promise();
-function createSchema() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            let targetFile;
-            process.env.NODE_ENV === "test"
-                ? (targetFile = "./MYSQL_Schema_test.sql")
-                : (targetFile = "./MYSQL_Schema.sql");
-            const SQLSchema = fs_1.default.readFileSync(targetFile, {
-                encoding: "utf8",
-            });
-            yield promisePool.query(SQLSchema);
-            yield promisePool.query("USE `YTSearchDB` ;");
-        }
-        catch (err) {
-            throw err;
-        }
-    });
-}
-createSchema();
 exports.default = promisePool;

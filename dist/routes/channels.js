@@ -40,6 +40,7 @@ router.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     //Returns JSON
     try {
         const id = req.params.id;
+        console.log(typeof id);
         const item = yield (0, db_queries_1.getItemByIDFromTable)("channels", id);
         if (item === 0)
             return res

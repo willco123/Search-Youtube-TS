@@ -7,7 +7,7 @@ router.get("/", async (_req, res, next) => {
   try {
     await getSearchResults();
     return res.status(200).send("Items stored in DB!");
-  } catch (err) {
+  } catch (err: any) {
     if (err.code == 403) {
       res.status(403).send("Forbidden, Quota exceeded");
     } else {

@@ -1,47 +1,57 @@
 import {
   searchDBFromTable,
-  getParentItemsByFK,
+  getParentItemByFK,
   getChildItemsWithFK,
+  searchVideosFromDB,
+  searchChannelsFromDB,
 } from "../database-access/db-queries";
 
-export async function searchChannels(query) {
+interface channelResults {
+  Videos: string[];
+  Channel: string;
+}
+
+interface videoResults {
+  Videos: string;
+  UploadDate: Date;
+  Channel: string;
+}
+
+export async function searchChannels(query: object): Promise<object> {
   try {
     const column = Object.keys(query)[0];
     const value = `%${Object.values(query)[0]}%`;
-    const results = await searchDBFromTable("channels", column, value);
+    const results = await searchChannelsFromDB(column, value);
+    const output: channelResults[] = [];
 
-    for (let index in results) {
-      const { id } = results[index];
-      const videosWithFK = await getChildItemsWithFK("videos", "title", id);
-      delete results[index].id;
-      results[index]["Videos"] = videosWithFK;
+    for (let { id: fk, channel_name: Channel } of results) {
+      const videosWithFK = await getChildItemsWithFK("videos", "title", fk);
+      output.push({ Channel: Channel, Videos: videosWithFK });
     }
 
-    return results;
+    return output;
   } catch (err) {
     throw err;
   }
 }
 
-export async function searchVideos(query) {
+export async function searchVideos(query: object): Promise<object> {
   try {
     const column = Object.keys(query)[0];
     const value = `%${Object.values(query)[0]}%`;
-    const results = await searchDBFromTable("videos", column, value);
+    const results = await searchVideosFromDB(column, value);
+    const output: videoResults[] = [];
 
-    for (let index in results) {
-      const { channel_id } = results[index];
-      const channelName = await getParentItemsByFK(
+    for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
+      const channelName = await getParentItemByFK(
         "channels",
         "channel_name",
-        channel_id,
+        fk,
       );
-      delete results[index].id;
-      delete results[index].channel_id;
-      results[index]["Channel"] = channelName;
+      output.push({ Channel: channelName, Videos, UploadDate });
     }
 
-    return results;
+    return output;
   } catch (err) {
     throw err;
   }

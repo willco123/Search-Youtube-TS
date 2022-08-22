@@ -17,11 +17,17 @@ const youtube = googleapis_1.google.youtube({
     version: "v3",
     auth: apiKey,
 });
+// interface searchParamsInterface {
+//   part: string;
+//   type: string;
+//   maxResults: number;
+//   q?: string;
+// }
 function appendPages(numberOfPages, response, nextPage) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            //if here
             const dataYT = [];
+            //should we await promise from map here?
             response.data.items.map((item) => dataYT.push({
                 title: item.snippet.title,
                 date: item.snippet.publishedAt.replace(/T|Z/g, " "),
@@ -30,10 +36,12 @@ function appendPages(numberOfPages, response, nextPage) {
             yield (0, store_yt_data_1.storeData)(dataYT);
             if (numberOfPages > 1) {
                 nextPage = response.data.nextPageToken;
+                // console.log(nextPage);
+                // console.log(typeof nextPage);
                 yield process.nextTick(() => { }); //fixes a jest open handle issue, something to do with axios
                 response = yield youtube.search.list(search_model_1.searchParams);
                 numberOfPages = --numberOfPages;
-                return yield QueryRecur(numberOfPages, response, nextPage);
+                return yield appendPages(numberOfPages, response, nextPage);
             }
             else {
                 return;
@@ -48,21 +56,23 @@ function queryYoutube(searchParams) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield process.nextTick(() => { });
-            var response = yield youtube.search.list(searchParams);
+            let response = yield youtube.search.list(searchParams);
+            if (response.data.pageInfo == undefined)
+                throw new Error("Bad Response");
             const totalResults = response.data.pageInfo.totalResults;
             const resultsPerPage = response.data.pageInfo.resultsPerPage;
-            const numberOfPages = Math.floor(totalResults / resultsPerPage);
-            var nextPage = response.data.nextPageToken;
+            if (totalResults == undefined || resultsPerPage == undefined)
+                throw new Error("No items found/ Bad search request");
+            const numberOfPages = resultsPerPage === 0 ? 0 : Math.floor(totalResults / resultsPerPage);
+            let nextPage = response.data.nextPageToken;
+            // console.log(numberOfPages);
+            // console.log(resultsPerPage);
+            // console.log(totalResults);
             yield appendPages(numberOfPages, response, nextPage);
             delete searchParams.pageToken;
         }
         catch (err) {
-            if (err.code == 403) {
-                throw err;
-            }
-            else {
-                console.log(err.stack);
-            }
+            throw err;
         }
     });
 }

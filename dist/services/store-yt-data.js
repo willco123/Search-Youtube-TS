@@ -16,13 +16,23 @@ function storeData(dataYT) {
         let channel_id;
         const table = "channels";
         const column = "channel_name";
-        console.log(dataYT);
         try {
-            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
-                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channelTitle);
+            const channelNames = getOnlyChannelNamesNoDuplicates(dataYT); //better if we somehow just do datayt.map and then pass in filtered array after, makes more sense
+            console.log(channelNames);
+            yield Promise.all(channelNames.map((channel) => __awaiter(this, void 0, void 0, function* () {
+                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channel);
                 channel_id = uniquenessValue
                     ? uniquenessValue
-                    : yield (0, db_queries_1.insertIntoChannelsReturnID)(channelTitle);
+                    : yield (0, db_queries_1.insertIntoChannelsReturnID)(channel);
+                dataYT.forEach((element, index) => {
+                    //probably slower than doing a simple for loop instead of async db calls, find better way to mutate dataYT.
+                    if (element.channelTitle === channel) {
+                        dataYT[index].channel_id = channel_id;
+                    }
+                });
+            })));
+            yield Promise.all(dataYT.map(({ title, date, channel_id }) => __awaiter(this, void 0, void 0, function* () {
+                channel_id = channel_id;
                 yield (0, db_queries_1.insertIntoVideos)(title, date, channel_id);
             })));
         }
@@ -32,3 +42,8 @@ function storeData(dataYT) {
     });
 }
 exports.storeData = storeData;
+function getOnlyChannelNamesNoDuplicates(dataYT) {
+    const filteredArray = dataYT.map((item) => item.channelTitle);
+    const setFilteredArray = [...new Set(filteredArray)];
+    return setFilteredArray;
+}

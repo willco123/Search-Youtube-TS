@@ -1,16 +1,22 @@
 import db from "../config/db";
-import { arrayTypeGuard } from "../utils/type-guarding-helper";
+import { arrayTypeGuard } from "../utils/type-guard-helpers";
+interface videoResults {
+  id: number;
+  title: string;
+  date: Date;
+  channel_id: number;
+}
+interface channelResults {
+  id: number;
+  channel_name: string;
+}
 
-type queryType = typeof db.query;
-interface resultHeader extends queryType {
-  [key: number]: string;
-  fieldCount?: number;
-  affectedRows?: number;
-  insertId?: number;
-  info?: string;
-  serverStatus?: number;
-  warningStatus?: number;
-  changedRows?: number;
+interface searchResults {
+  id: number;
+  title?: string;
+  date?: Date;
+  channel_name?: string;
+  channel_id?: number;
 }
 
 export async function insertIntoChannelsReturnID(
@@ -51,7 +57,6 @@ export async function checkUniqueness(
   value: string,
 ): Promise<number> {
   // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
-  console.log("hey");
   try {
     const [query] = await db.query("SELECT * from ?? where (??) = (?)", [
       table,
@@ -103,21 +108,46 @@ export async function searchDBFromTable(
   table: string,
   column: string,
   value: string,
-): Promise<object> {
-  const [query] = await db.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
+): Promise<searchResults[]> {
+  const query = await db.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
     table,
     column,
     value,
   ]);
-  const results = query;
+  const results: searchResults[] = arrayTypeGuard(query);
+  console.log(Array.isArray(results));
+  return results;
+}
+export async function searchChannelsFromDB(
+  column: string,
+  value: string,
+): Promise<channelResults[]> {
+  const query = await db.query("SELECT * FROM channels WHERE (??) LIKE (?)", [
+    column,
+    value,
+  ]);
+  const results: channelResults[] = arrayTypeGuard(query);
+  console.log(Array.isArray(results));
+  return results;
+}
+export async function searchVideosFromDB(
+  column: string,
+  value: string,
+): Promise<videoResults[]> {
+  const query = await db.query("SELECT * FROM videos WHERE (??) LIKE (?)", [
+    column,
+    value,
+  ]);
+  const results: videoResults[] = arrayTypeGuard(query);
+  console.log(Array.isArray(results));
   return results;
 }
 
-export async function getParentItemsByFK(
+export async function getParentItemByFK(
   parentTable: string,
   parentColumn: string,
   fk: number,
-) {
+): Promise<string> {
   const [query] = await db.query("select (??) from ?? where id = ? ", [
     parentColumn,
     parentTable,

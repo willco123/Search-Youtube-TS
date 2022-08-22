@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getChildItemsWithFK = exports.getParentItemsByFK = exports.searchDBFromTable = exports.deleteItemByIDFromTable = exports.getItemByIDFromTable = exports.getAllFromTable = exports.checkUniqueness = exports.insertIntoVideos = exports.insertIntoChannelsReturnID = void 0;
+exports.getChildItemsWithFK = exports.getParentItemByFK = exports.searchVideosFromDB = exports.searchChannelsFromDB = exports.searchDBFromTable = exports.deleteItemByIDFromTable = exports.getItemByIDFromTable = exports.getAllFromTable = exports.checkUniqueness = exports.insertIntoVideos = exports.insertIntoChannelsReturnID = void 0;
 const db_1 = __importDefault(require("../config/db"));
-const type_guarding_helper_1 = require("../utils/type-guarding-helper");
+const type_guard_helpers_1 = require("../utils/type-guard-helpers");
 function insertIntoChannelsReturnID(channelTitle) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -44,7 +44,6 @@ exports.insertIntoVideos = insertIntoVideos;
 function checkUniqueness(table, column, value) {
     return __awaiter(this, void 0, void 0, function* () {
         // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
-        console.log("hey");
         try {
             const [query] = yield db_1.default.query("SELECT * from ?? where (??) = (?)", [
                 table,
@@ -98,28 +97,53 @@ function deleteItemByIDFromTable(table, id) {
 exports.deleteItemByIDFromTable = deleteItemByIDFromTable;
 function searchDBFromTable(table, column, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        const [query] = yield db_1.default.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
+        const query = yield db_1.default.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
             table,
             column,
             value,
         ]);
-        const results = query;
+        const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
+        console.log(Array.isArray(results));
         return results;
     });
 }
 exports.searchDBFromTable = searchDBFromTable;
-function getParentItemsByFK(parentTable, parentColumn, fk) {
+function searchChannelsFromDB(column, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = yield db_1.default.query("SELECT * FROM channels WHERE (??) LIKE (?)", [
+            column,
+            value,
+        ]);
+        const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
+        console.log(Array.isArray(results));
+        return results;
+    });
+}
+exports.searchChannelsFromDB = searchChannelsFromDB;
+function searchVideosFromDB(column, value) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = yield db_1.default.query("SELECT * FROM videos WHERE (??) LIKE (?)", [
+            column,
+            value,
+        ]);
+        const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
+        console.log(Array.isArray(results));
+        return results;
+    });
+}
+exports.searchVideosFromDB = searchVideosFromDB;
+function getParentItemByFK(parentTable, parentColumn, fk) {
     return __awaiter(this, void 0, void 0, function* () {
         const [query] = yield db_1.default.query("select (??) from ?? where id = ? ", [
             parentColumn,
             parentTable,
             fk,
         ]);
-        const parentItem = (0, type_guarding_helper_1.arrayTypeGuard)(query);
+        const parentItem = (0, type_guard_helpers_1.arrayTypeGuard)(query);
         return parentItem[parentColumn];
     });
 }
-exports.getParentItemsByFK = getParentItemsByFK;
+exports.getParentItemByFK = getParentItemByFK;
 function getChildItemsWithFK(childTable, childColumn, fk) {
     return __awaiter(this, void 0, void 0, function* () {
         const [query] = yield db_1.default.query("select (??) from ?? where channel_id = ? ", [

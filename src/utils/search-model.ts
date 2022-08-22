@@ -1,6 +1,13 @@
-import { readFileSyncByLine, readFileAsyncByLine } from "./file-helpers";
+import { readFileSyncByLine } from "./file-helpers";
 
-export var searchParams = {
+// interface searchParamsInterface {
+//   part: string;
+//   type: string;
+//   maxResults: number;
+//   q?: string;
+// }
+
+export var searchParams: any = {
   part: "snippet",
   type: "video",
   maxResults: 50,

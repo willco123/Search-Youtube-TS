@@ -16,13 +16,3 @@ function readFileSyncByLine(inputFile) {
     }
 }
 exports.readFileSyncByLine = readFileSyncByLine;
-// export async function readFileAsyncByLine(inputFile) {
-//   try {
-//     const data = (await fsp.readFile(inputFile, { encoding: "utf8" })).split(
-//       "\r\n",
-//     );
-//     return data;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }

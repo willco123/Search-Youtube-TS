@@ -5,24 +5,19 @@ import {
   getItemByIDFromTable,
   deleteItemByIDFromTable,
 } from "../database-access/db-queries";
-import { SearchVideos } from "../services/search-request";
+import { searchVideos } from "../services/search-request";
 import checkForQuery from "../utils/check-for-query";
 
 router.get("/", async (req, res, next) => {
   try {
     const query = req.query;
-
     const isQuery = checkForQuery(query);
 
-    let output;
-
-    if (isQuery) {
-      output = await SearchVideos(query);
-    } else {
-      output = await getAllFromTable("videos");
-    }
+    let output: object = isQuery
+      ? await searchVideos(query)
+      : await getAllFromTable("videos");
     return res.status(200).send(output);
-  } catch (err: unknown) {
+  } catch (err: any) {
     if (err.code === "ER_BAD_FIELD_ERROR")
       return res.status(404).send("Incorrect column name");
     next(err);
@@ -31,11 +26,11 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const id: number = parseInt(req.params.id, 10);
     const item = await getItemByIDFromTable("videos", id);
-    if (item === 0)
-      return res.status(404).send("A video with that given id cannot be found");
-    return res.status(200).send(item);
+    return item
+      ? res.status(200).send(item)
+      : res.status(404).send("A video with that given id cannot be found");
   } catch (err) {
     next(err);
   }
@@ -43,12 +38,11 @@ router.get("/:id", async (req, res, next) => {
 
 router.delete("/:id", async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const id: number = parseInt(req.params.id, 10);
     const deletedItem = await deleteItemByIDFromTable("videos", id);
-    if (deletedItem === 0)
-      return res.status(404).send("A video with the given ID was not found");
-
-    return res.status(200).send("Record Successfully deleted");
+    return deletedItem
+      ? res.status(200).send("Record Successfully deleted")
+      : res.status(404).send("A video with the given ID was not found");
   } catch (err) {
     next(err);
   }

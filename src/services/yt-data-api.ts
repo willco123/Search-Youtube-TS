@@ -9,11 +9,24 @@ const youtube = google.youtube({
   auth: apiKey,
 });
 
-async function appendPages(numberOfPages, response, nextPage) {
-  try {
-    //if here
+interface dataYT {
+  title: string;
+  date: Date;
+  channelTitle: string;
+  id?: number;
+}
 
-    const dataYT = [];
+// interface searchParamsInterface {
+//   part: string;
+//   type: string;
+//   maxResults: number;
+//   q?: string;
+// }
+
+async function appendPages(numberOfPages: number, response, nextPage) {
+  try {
+    const dataYT: any = [];
+    //should we await promise from map here?
     response.data.items.map((item) =>
       dataYT.push({
         title: item.snippet.title,
@@ -21,16 +34,18 @@ async function appendPages(numberOfPages, response, nextPage) {
         channelTitle: item.snippet.channelTitle,
       }),
     );
-    await storeData(dataYT);
+    await storeData(dataYT as dataYT[]);
 
     if (numberOfPages > 1) {
       nextPage = response.data.nextPageToken;
+      // console.log(nextPage);
+      // console.log(typeof nextPage);
 
       await process.nextTick(() => {}); //fixes a jest open handle issue, something to do with axios
       response = await youtube.search.list(searchParams);
 
       numberOfPages = --numberOfPages;
-      return await QueryRecur(numberOfPages, response, nextPage);
+      return await appendPages(numberOfPages, response, nextPage);
     } else {
       return;
     }
@@ -39,33 +54,37 @@ async function appendPages(numberOfPages, response, nextPage) {
   }
 }
 
-async function queryYoutube(searchParams) {
+async function queryYoutube(searchParams: any) {
   try {
     await process.nextTick(() => {});
-    var response = await youtube.search.list(searchParams);
+    let response = await youtube.search.list(searchParams);
+    if (response.data.pageInfo == undefined) throw new Error("Bad Response");
 
     const totalResults = response.data.pageInfo.totalResults;
     const resultsPerPage = response.data.pageInfo.resultsPerPage;
-    const numberOfPages = Math.floor(totalResults / resultsPerPage);
 
-    var nextPage = response.data.nextPageToken;
+    if (totalResults == undefined || resultsPerPage == undefined)
+      throw new Error("No items found/ Bad search request");
 
+    const numberOfPages =
+      resultsPerPage === 0 ? 0 : Math.floor(totalResults / resultsPerPage);
+    let nextPage = response.data.nextPageToken;
+    // console.log(numberOfPages);
+    // console.log(resultsPerPage);
+    // console.log(totalResults);
     await appendPages(numberOfPages, response, nextPage);
 
     delete searchParams.pageToken;
-  } catch (err) {
-    if (err.code == 403) {
-      throw err;
-    } else {
-      console.log(err.stack);
-    }
+  } catch (err: any) {
+    throw err;
   }
 }
 
 export default async function getSearchResults() {
   //All phrases in string have to be in title
   for (let i in searchArray) {
-    const searchQuery = "allintitle:" + searchArray[i];
+    const searchQuery =
+      "allintitle:" + searchArray[i as keyof typeof searchArray];
     searchParams.q = searchQuery;
     await queryYoutube(searchParams);
   }
@@ -73,8 +92,10 @@ export default async function getSearchResults() {
 
 async function getSearchResultsSpecific() {
   //Has to match the phrase exactly in order
+
   for (let i in searchArray) {
-    const searchQuery = 'intitle:"' + searchArray[i] + '"';
+    const searchQuery =
+      'intitle:"' + searchArray[i as keyof typeof searchArray] + '"';
     searchParams.q = searchQuery;
     await queryYoutube(searchParams);
   }

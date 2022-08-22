@@ -16,14 +16,13 @@ function searchChannels(query) {
         try {
             const column = Object.keys(query)[0];
             const value = `%${Object.values(query)[0]}%`;
-            const results = yield (0, db_queries_1.searchDBFromTable)("channels", column, value);
-            for (let index in results) {
-                const { id } = results[index];
-                const videosWithFK = yield (0, db_queries_1.getChildItemsWithFK)("videos", "title", id);
-                delete results[index].id;
-                results[index]["Videos"] = videosWithFK;
+            const results = yield (0, db_queries_1.searchChannelsFromDB)(column, value);
+            const output = [];
+            for (let { id: fk, channel_name: Channel } of results) {
+                const videosWithFK = yield (0, db_queries_1.getChildItemsWithFK)("videos", "title", fk);
+                output.push({ Channel: Channel, Videos: videosWithFK });
             }
-            return results;
+            return output;
         }
         catch (err) {
             throw err;
@@ -36,15 +35,13 @@ function searchVideos(query) {
         try {
             const column = Object.keys(query)[0];
             const value = `%${Object.values(query)[0]}%`;
-            const results = yield (0, db_queries_1.searchDBFromTable)("videos", column, value);
-            for (let index in results) {
-                const { channel_id } = results[index];
-                const channelName = yield (0, db_queries_1.getParentItemsByFK)("channels", "channel_name", channel_id);
-                delete results[index].id;
-                delete results[index].channel_id;
-                results[index]["Channel"] = channelName;
+            const results = yield (0, db_queries_1.searchVideosFromDB)(column, value);
+            const output = [];
+            for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
+                const channelName = yield (0, db_queries_1.getParentItemByFK)("channels", "channel_name", fk);
+                output.push({ Channel: channelName, Videos, UploadDate });
             }
-            return results;
+            return output;
         }
         catch (err) {
             throw err;

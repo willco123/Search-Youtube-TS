@@ -2,6 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchArray = exports.searchParams = void 0;
 const file_helpers_1 = require("./file-helpers");
+// interface searchParamsInterface {
+//   part: string;
+//   type: string;
+//   maxResults: number;
+//   q?: string;
+// }
 exports.searchParams = {
     part: "snippet",
     type: "video",

@@ -33,11 +33,12 @@ function appendPages(numberOfPages, response, nextPage) {
                 date: item.snippet.publishedAt.replace(/T|Z/g, " "),
                 channelTitle: item.snippet.channelTitle,
             }));
+            console.log(dataYT);
             yield (0, store_yt_data_1.storeData)(dataYT);
             if (numberOfPages > 1) {
                 nextPage = response.data.nextPageToken;
-                // console.log(nextPage);
-                // console.log(typeof nextPage);
+                console.log(nextPage);
+                search_model_1.searchParams.pageToken = nextPage;
                 yield process.nextTick(() => { }); //fixes a jest open handle issue, something to do with axios
                 response = yield youtube.search.list(search_model_1.searchParams);
                 numberOfPages = --numberOfPages;
@@ -64,10 +65,7 @@ function queryYoutube(searchParams) {
             if (totalResults == undefined || resultsPerPage == undefined)
                 throw new Error("No items found/ Bad search request");
             const numberOfPages = resultsPerPage === 0 ? 0 : Math.floor(totalResults / resultsPerPage);
-            let nextPage = response.data.nextPageToken;
-            // console.log(numberOfPages);
-            // console.log(resultsPerPage);
-            // console.log(totalResults);
+            let nextPage;
             yield appendPages(numberOfPages, response, nextPage);
             delete searchParams.pageToken;
         }

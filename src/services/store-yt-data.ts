@@ -4,6 +4,7 @@ import {
   checkUniqueness,
 } from "../database-access/db-queries";
 
+import { getOnlyChannelNamesNoDuplicates } from "../utils/function-helpers";
 interface dataYT {
   title: string;
   date: Date;
@@ -33,7 +34,6 @@ async function insertChannel(dataYT: dataYT[]) {
     const channelNames = getOnlyChannelNamesNoDuplicates(dataYT);
     await Promise.all(
       channelNames.map(async ({ channelTitle: channel }, index) => {
-        console.log(channel);
         const uniquenessValue: number = await checkUniqueness(
           table,
           column,
@@ -69,16 +69,4 @@ async function insertVideos(
   } catch (err) {
     throw err;
   }
-}
-
-function getOnlyChannelNamesNoDuplicates(
-  dataYT: dataYT[],
-): insertChannelVideos[] {
-  const uniqueArr = [...new Set(dataYT.map((item) => item.channelTitle))];
-  const uniqueObjArr = [];
-  for (let i = 0; i < uniqueArr.length; i++) {
-    uniqueObjArr.push({ channelTitle: uniqueArr[i] });
-  }
-
-  return uniqueObjArr;
 }

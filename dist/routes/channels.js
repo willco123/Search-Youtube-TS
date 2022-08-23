@@ -16,11 +16,11 @@ const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const db_queries_1 = require("../database-access/db-queries");
 const search_request_1 = require("../services/search-request");
-const check_for_query_1 = __importDefault(require("../utils/check-for-query"));
+const function_helpers_1 = require("../utils/function-helpers");
 router.get("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let query = req.query;
-        const isQuery = (0, check_for_query_1.default)(query);
+        const isQuery = (0, function_helpers_1.checkForQuery)(query);
         let output = isQuery
             ? yield (0, search_request_1.searchChannels)(query)
             : yield (0, db_queries_1.getAllFromTable)("channels");

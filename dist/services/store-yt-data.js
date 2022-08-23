@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.storeData = void 0;
 const db_queries_1 = require("../database-access/db-queries");
+const function_helpers_1 = require("../utils/function-helpers");
 function storeData(dataYT) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -29,9 +30,8 @@ function insertChannel(dataYT) {
         const table = "channels";
         const column = "channel_name";
         try {
-            const channelNames = getOnlyChannelNamesNoDuplicates(dataYT);
+            const channelNames = (0, function_helpers_1.getOnlyChannelNamesNoDuplicates)(dataYT);
             yield Promise.all(channelNames.map(({ channelTitle: channel }, index) => __awaiter(this, void 0, void 0, function* () {
-                console.log(channel);
                 const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channel);
                 channel_id = uniquenessValue
                     ? uniquenessValue
@@ -60,12 +60,4 @@ function insertVideos(dataYT, channelNames) {
             throw err;
         }
     });
-}
-function getOnlyChannelNamesNoDuplicates(dataYT) {
-    const uniqueArr = [...new Set(dataYT.map((item) => item.channelTitle))];
-    const uniqueObjArr = [];
-    for (let i = 0; i < uniqueArr.length; i++) {
-        uniqueObjArr.push({ channelTitle: uniqueArr[i] });
-    }
-    return uniqueObjArr;
 }

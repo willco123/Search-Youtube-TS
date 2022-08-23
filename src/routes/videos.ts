@@ -6,7 +6,7 @@ import {
   deleteItemByIDFromTable,
 } from "../database-access/db-queries";
 import { searchVideos } from "../services/search-request";
-import checkForQuery from "../utils/check-for-query";
+import { checkForQuery } from "../utils/function-helpers";
 
 router.get("/", async (req, res, next) => {
   try {

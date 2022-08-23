@@ -23,24 +23,28 @@ interface dataYT {
 //   q?: string;
 // }
 
-async function appendPages(numberOfPages: number, response, nextPage) {
+async function appendPages(
+  numberOfPages: number,
+  response: any,
+  nextPage: string | undefined,
+): Promise<void> {
   try {
     const dataYT: any = [];
     //should we await promise from map here?
-    response.data.items.map((item) =>
+    response.data.items.map((item: any) =>
       dataYT.push({
         title: item.snippet.title,
         date: item.snippet.publishedAt.replace(/T|Z/g, " "),
         channelTitle: item.snippet.channelTitle,
       }),
     );
+    console.log(dataYT);
     await storeData(dataYT as dataYT[]);
 
     if (numberOfPages > 1) {
       nextPage = response.data.nextPageToken;
-      // console.log(nextPage);
-      // console.log(typeof nextPage);
-
+      console.log(nextPage);
+      searchParams.pageToken = nextPage;
       await process.nextTick(() => {}); //fixes a jest open handle issue, something to do with axios
       response = await youtube.search.list(searchParams);
 
@@ -68,10 +72,7 @@ async function queryYoutube(searchParams: any) {
 
     const numberOfPages =
       resultsPerPage === 0 ? 0 : Math.floor(totalResults / resultsPerPage);
-    let nextPage = response.data.nextPageToken;
-    // console.log(numberOfPages);
-    // console.log(resultsPerPage);
-    // console.log(totalResults);
+    let nextPage: string | undefined;
     await appendPages(numberOfPages, response, nextPage);
 
     delete searchParams.pageToken;

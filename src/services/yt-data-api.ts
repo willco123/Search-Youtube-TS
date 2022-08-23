@@ -16,13 +16,6 @@ interface dataYT {
   id?: number;
 }
 
-// interface searchParamsInterface {
-//   part: string;
-//   type: string;
-//   maxResults: number;
-//   q?: string;
-// }
-
 async function appendPages(
   numberOfPages: number,
   response: any,
@@ -30,7 +23,6 @@ async function appendPages(
 ): Promise<void> {
   try {
     const dataYT: any = [];
-    //should we await promise from map here?
     response.data.items.map((item: any) =>
       dataYT.push({
         title: item.snippet.title,
@@ -38,7 +30,6 @@ async function appendPages(
         channelTitle: item.snippet.channelTitle,
       }),
     );
-    console.log(dataYT);
     await storeData(dataYT as dataYT[]);
 
     if (numberOfPages > 1) {
@@ -81,8 +72,10 @@ async function queryYoutube(searchParams: any) {
   }
 }
 
+/**
+ *All phrases in string have to be in title
+ */
 export default async function getSearchResults() {
-  //All phrases in string have to be in title
   for (let i in searchArray) {
     const searchQuery =
       "allintitle:" + searchArray[i as keyof typeof searchArray];
@@ -91,9 +84,10 @@ export default async function getSearchResults() {
   }
 }
 
+/**
+ * Has to match the phrase exactly in order
+ */
 async function getSearchResultsSpecific() {
-  //Has to match the phrase exactly in order
-
   for (let i in searchArray) {
     const searchQuery =
       'intitle:"' + searchArray[i as keyof typeof searchArray] + '"';

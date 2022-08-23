@@ -1,20 +1,12 @@
 export function checkForQuery(query: object): boolean {
-  let isQuery;
-  if (Object.keys(query).length === 0) {
-    isQuery = false;
-  } else {
-    if (
-      Object.values(query)[0].length === 0 ||
-      Object.values(query)[0] === " " //resolved a typeerror issue
-    ) {
-      isQuery = false;
-    } else {
-      isQuery = true;
-    }
-  }
+  const isQuery =
+    Object.keys(query).length === 0
+      ? false
+      : Object.values(query)[0].length === 0
+      ? false
+      : true;
   return isQuery;
 }
-
 interface dataYT {
   title: string;
   date: Date;

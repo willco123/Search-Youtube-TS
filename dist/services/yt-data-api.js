@@ -17,23 +17,15 @@ const youtube = googleapis_1.google.youtube({
     version: "v3",
     auth: apiKey,
 });
-// interface searchParamsInterface {
-//   part: string;
-//   type: string;
-//   maxResults: number;
-//   q?: string;
-// }
 function appendPages(numberOfPages, response, nextPage) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const dataYT = [];
-            //should we await promise from map here?
             response.data.items.map((item) => dataYT.push({
                 title: item.snippet.title,
                 date: item.snippet.publishedAt.replace(/T|Z/g, " "),
                 channelTitle: item.snippet.channelTitle,
             }));
-            console.log(dataYT);
             yield (0, store_yt_data_1.storeData)(dataYT);
             if (numberOfPages > 1) {
                 nextPage = response.data.nextPageToken;
@@ -74,9 +66,11 @@ function queryYoutube(searchParams) {
         }
     });
 }
+/**
+ *All phrases in string have to be in title
+ */
 function getSearchResults() {
     return __awaiter(this, void 0, void 0, function* () {
-        //All phrases in string have to be in title
         for (let i in search_model_1.searchArray) {
             const searchQuery = "allintitle:" + search_model_1.searchArray[i];
             search_model_1.searchParams.q = searchQuery;
@@ -85,9 +79,11 @@ function getSearchResults() {
     });
 }
 exports.default = getSearchResults;
+/**
+ * Has to match the phrase exactly in order
+ */
 function getSearchResultsSpecific() {
     return __awaiter(this, void 0, void 0, function* () {
-        //Has to match the phrase exactly in order
         for (let i in search_model_1.searchArray) {
             const searchQuery = 'intitle:"' + search_model_1.searchArray[i] + '"';
             search_model_1.searchParams.q = searchQuery;

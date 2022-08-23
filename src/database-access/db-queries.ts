@@ -56,7 +56,6 @@ export async function checkUniqueness(
   column: string,
   value: string,
 ): Promise<number> {
-  // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
   try {
     const [query] = await db.query("SELECT * from ?? where (??) = (?)", [
       table,
@@ -95,13 +94,13 @@ export async function getItemByIDFromTable(
 export async function deleteItemByIDFromTable(
   table: string,
   id: number,
-): Promise<number> {
+): Promise<boolean> {
   const [deletedItem]: any = await db.query("DELETE FROM ?? WHERE id = (?)", [
     table,
     id,
   ]);
-  if (deletedItem.affectedRows === 0) return 0;
-  else return 1;
+  if (deletedItem.affectedRows === 0) return false;
+  else return true;
 }
 
 export async function searchDBFromTable(
@@ -115,7 +114,6 @@ export async function searchDBFromTable(
     value,
   ]);
   const results: searchResults[] = arrayTypeGuard(query);
-  console.log(Array.isArray(results));
   return results;
 }
 export async function searchChannelsFromDB(
@@ -127,7 +125,6 @@ export async function searchChannelsFromDB(
     value,
   ]);
   const results: channelResults[] = arrayTypeGuard(query);
-  console.log(Array.isArray(results));
   return results;
 }
 export async function searchVideosFromDB(
@@ -139,7 +136,6 @@ export async function searchVideosFromDB(
     value,
   ]);
   const results: videoResults[] = arrayTypeGuard(query);
-  console.log(Array.isArray(results));
   return results;
 }
 

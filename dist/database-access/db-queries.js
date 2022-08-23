@@ -43,7 +43,6 @@ function insertIntoVideos(title, date, id) {
 exports.insertIntoVideos = insertIntoVideos;
 function checkUniqueness(table, column, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        // await db.query("USE `YTSearchDB` ;"); //Fixes async pool issues with map
         try {
             const [query] = yield db_1.default.query("SELECT * from ?? where (??) = (?)", [
                 table,
@@ -89,9 +88,9 @@ function deleteItemByIDFromTable(table, id) {
             id,
         ]);
         if (deletedItem.affectedRows === 0)
-            return 0;
+            return false;
         else
-            return 1;
+            return true;
     });
 }
 exports.deleteItemByIDFromTable = deleteItemByIDFromTable;
@@ -103,7 +102,6 @@ function searchDBFromTable(table, column, value) {
             value,
         ]);
         const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
-        console.log(Array.isArray(results));
         return results;
     });
 }
@@ -115,7 +113,6 @@ function searchChannelsFromDB(column, value) {
             value,
         ]);
         const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
-        console.log(Array.isArray(results));
         return results;
     });
 }
@@ -127,7 +124,6 @@ function searchVideosFromDB(column, value) {
             value,
         ]);
         const results = (0, type_guard_helpers_1.arrayTypeGuard)(query);
-        console.log(Array.isArray(results));
         return results;
     });
 }

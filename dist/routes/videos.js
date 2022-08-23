@@ -35,6 +35,8 @@ router.get("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
 router.get("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const id = parseInt(req.params.id, 10);
+        if (isNaN(id))
+            throw new Error("Incorrect Index");
         const item = yield (0, db_queries_1.getItemByIDFromTable)("videos", id);
         return item
             ? res.status(200).send(item)

@@ -42,8 +42,6 @@ export async function searchVideos(query: object): Promise<object> {
     const results = await searchVideosFromDB(column, value);
     const output: videoResults[] = [];
     for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
-      console.log(fk);
-      console.log("here");
       const channelName =
         fk === null
           ? "Null"

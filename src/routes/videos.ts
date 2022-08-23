@@ -27,6 +27,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const id: number = parseInt(req.params.id, 10);
+    if (isNaN(id)) throw new Error("Incorrect Index");
     const item = await getItemByIDFromTable("videos", id);
     return item
       ? res.status(200).send(item)

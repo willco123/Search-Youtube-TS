@@ -15,12 +15,13 @@ function searchChannels(query) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const column = Object.keys(query)[0];
-            const value = `%${Object.values(query)[0]}%`;
-            const results = yield (0, db_queries_1.searchChannelsFromDB)(column, value);
+            // const value = `%${Object.values(query)[0]}%`;
+            const searchTerms = Object.values(query)[0].split(" ").join("|");
+            const results = yield (0, db_queries_1.searchChannelsFromDB)(column, searchTerms);
             const output = [];
-            for (let { id: fk, channel_name: Channel } of results) {
+            for (let { id: fk, channel_name } of results) {
                 const videosWithFK = yield (0, db_queries_1.getChildItemsWithFK)("videos", "title", fk);
-                output.push({ Channel: Channel, Videos: videosWithFK });
+                output.push({ id: fk, channel_name, titles: videosWithFK });
             }
             return output;
         }
@@ -37,11 +38,17 @@ function searchVideos(query) {
             const value = `%${Object.values(query)[0]}%`;
             const results = yield (0, db_queries_1.searchVideosFromDB)(column, value);
             const output = [];
-            for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
+            for (let { id, title, channel_id: fk, date } of results) {
                 const channelName = fk === null
                     ? "Null"
                     : yield (0, db_queries_1.getParentItemByFK)("channels", "channel_name", fk);
-                output.push({ Channel: channelName, Videos, UploadDate });
+                output.push({
+                    id,
+                    title,
+                    date,
+                    channel_name: channelName,
+                    channel_id: fk,
+                });
             }
             return output;
         }

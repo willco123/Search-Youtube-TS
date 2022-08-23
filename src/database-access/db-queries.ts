@@ -20,13 +20,13 @@ interface searchResults {
 }
 
 export async function insertIntoChannelsReturnID(
-  channelTitle: string,
+  channelName: string,
 ): Promise<number> {
   try {
     let [query] = await db.query(
       "INSERT INTO CHANNELS(channel_name)\
                       VALUES (?)",
-      [channelTitle],
+      [channelName],
     );
     const idAlias: any = query;
     return idAlias.insertId; //fixes trivial type checking error
@@ -120,7 +120,7 @@ export async function searchChannelsFromDB(
   column: string,
   value: string,
 ): Promise<channelResults[]> {
-  const query = await db.query("SELECT * FROM channels WHERE (??) LIKE (?)", [
+  const query = await db.query("SELECT * FROM channels WHERE (??) RLIKE (?)", [
     column,
     value,
   ]);
@@ -131,7 +131,7 @@ export async function searchVideosFromDB(
   column: string,
   value: string,
 ): Promise<videoResults[]> {
-  const query = await db.query("SELECT * FROM videos WHERE (??) LIKE (?)", [
+  const query = await db.query("SELECT * FROM videos WHERE (??) RLIKE (?)", [
     column,
     value,
   ]);

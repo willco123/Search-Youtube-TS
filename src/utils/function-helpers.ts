@@ -10,12 +10,12 @@ export function checkForQuery(query: object): boolean {
 interface dataYT {
   title: string;
   date: Date;
-  channelTitle: string;
+  channelName: string;
   id?: number;
 }
 interface insertChannelVideos {
-  channelTitle: string;
-  channel_id?: number;
+  channelName: string;
+  channelID?: number;
 }
 
 /**
@@ -25,10 +25,10 @@ interface insertChannelVideos {
 export function getOnlyChannelNamesNoDuplicates(
   dataYT: dataYT[],
 ): insertChannelVideos[] {
-  const uniqueArr = [...new Set(dataYT.map((item) => item.channelTitle))];
+  const uniqueArr = [...new Set(dataYT.map((item) => item.channelName))];
   const uniqueObjArr = [];
   for (let i = 0; i < uniqueArr.length; i++) {
-    uniqueObjArr.push({ channelTitle: uniqueArr[i] });
+    uniqueObjArr.push({ channelName: uniqueArr[i] });
   }
 
   return uniqueObjArr;

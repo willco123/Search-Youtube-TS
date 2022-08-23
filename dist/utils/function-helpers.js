@@ -15,10 +15,10 @@ exports.checkForQuery = checkForQuery;
  * @param {dataYT[]} dataYT
  */
 function getOnlyChannelNamesNoDuplicates(dataYT) {
-    const uniqueArr = [...new Set(dataYT.map((item) => item.channelTitle))];
+    const uniqueArr = [...new Set(dataYT.map((item) => item.channelName))];
     const uniqueObjArr = [];
     for (let i = 0; i < uniqueArr.length; i++) {
-        uniqueObjArr.push({ channelTitle: uniqueArr[i] });
+        uniqueObjArr.push({ channelName: uniqueArr[i] });
     }
     return uniqueObjArr;
 }

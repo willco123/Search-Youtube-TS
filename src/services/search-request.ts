@@ -1,5 +1,4 @@
 import {
-  searchDBFromTable,
   getParentItemByFK,
   getChildItemsWithFK,
   searchVideosFromDB,
@@ -7,26 +6,30 @@ import {
 } from "../database-access/db-queries";
 
 interface channelResults {
-  Videos: string[];
-  Channel: string;
+  id: number;
+  titles: string[];
+  channel_name: string;
 }
 
 interface videoResults {
-  Videos: string;
-  UploadDate: Date;
-  Channel: string;
+  id: number;
+  title: string;
+  date: Date;
+  channel_name: string;
+  channel_id: number;
 }
 
 export async function searchChannels(query: object): Promise<object> {
   try {
     const column = Object.keys(query)[0];
-    const value = `%${Object.values(query)[0]}%`;
-    const results = await searchChannelsFromDB(column, value);
+    // const value = `%${Object.values(query)[0]}%`;
+    const searchTerms = Object.values(query)[0].split(" ").join("|");
+    const results = await searchChannelsFromDB(column, searchTerms);
     const output: channelResults[] = [];
 
-    for (let { id: fk, channel_name: Channel } of results) {
+    for (let { id: fk, channel_name } of results) {
       const videosWithFK = await getChildItemsWithFK("videos", "title", fk);
-      output.push({ Channel: Channel, Videos: videosWithFK });
+      output.push({ id: fk, channel_name, titles: videosWithFK });
     }
 
     return output;
@@ -41,13 +44,19 @@ export async function searchVideos(query: object): Promise<object> {
     const value = `%${Object.values(query)[0]}%`;
     const results = await searchVideosFromDB(column, value);
     const output: videoResults[] = [];
-    for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
+    for (let { id, title, channel_id: fk, date } of results) {
       const channelName =
         fk === null
           ? "Null"
           : await getParentItemByFK("channels", "channel_name", fk);
 
-      output.push({ Channel: channelName, Videos, UploadDate });
+      output.push({
+        id,
+        title,
+        date,
+        channel_name: channelName,
+        channel_id: fk,
+      });
     }
 
     return output;

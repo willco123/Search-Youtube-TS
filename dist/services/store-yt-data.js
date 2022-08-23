@@ -26,17 +26,17 @@ function storeData(dataYT) {
 exports.storeData = storeData;
 function insertChannel(dataYT) {
     return __awaiter(this, void 0, void 0, function* () {
-        let channel_id;
+        let channelID;
         const table = "channels";
         const column = "channel_name";
         try {
             const channelNames = (0, function_helpers_1.getOnlyChannelNamesNoDuplicates)(dataYT);
-            yield Promise.all(channelNames.map(({ channelTitle: channel }, index) => __awaiter(this, void 0, void 0, function* () {
-                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channel);
-                channel_id = uniquenessValue
+            yield Promise.all(channelNames.map(({ channelName }, index) => __awaiter(this, void 0, void 0, function* () {
+                const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channelName);
+                channelID = uniquenessValue
                     ? uniquenessValue
-                    : yield (0, db_queries_1.insertIntoChannelsReturnID)(channel);
-                channelNames[index].channel_id = channel_id;
+                    : yield (0, db_queries_1.insertIntoChannelsReturnID)(channelName);
+                channelNames[index].channelID = channelID;
             })));
             return channelNames;
         }
@@ -48,12 +48,12 @@ function insertChannel(dataYT) {
 function insertVideos(dataYT, channelNames) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
-                const channelNameID = channelNames.find((item) => item.channelTitle === channelTitle);
-                const channel_id = channelNameID === null || channelNameID === void 0 ? void 0 : channelNameID.channel_id;
-                if (channel_id === undefined)
+            yield Promise.all(dataYT.map(({ title, date, channelName }) => __awaiter(this, void 0, void 0, function* () {
+                const channelNameID = channelNames.find((item) => item.channelName === channelName);
+                const channelID = channelNameID === null || channelNameID === void 0 ? void 0 : channelNameID.channelID;
+                if (channelID === undefined)
                     return "No channel id found";
-                yield (0, db_queries_1.insertIntoVideos)(title, date, channel_id);
+                yield (0, db_queries_1.insertIntoVideos)(title, date, channelID);
             })));
         }
         catch (err) {

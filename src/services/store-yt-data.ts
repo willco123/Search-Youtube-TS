@@ -8,13 +8,13 @@ import { getOnlyChannelNamesNoDuplicates } from "../utils/function-helpers";
 interface dataYT {
   title: string;
   date: Date;
-  channelTitle: string;
-  channel_id?: number;
+  channelName: string;
+  channelID?: number;
 }
 
 interface insertChannelVideos {
-  channelTitle: string;
-  channel_id?: number;
+  channelName: string;
+  channelID?: number;
 }
 export async function storeData(dataYT: dataYT[]): Promise<void> {
   try {
@@ -26,23 +26,23 @@ export async function storeData(dataYT: dataYT[]): Promise<void> {
 }
 
 async function insertChannel(dataYT: dataYT[]) {
-  let channel_id: number;
+  let channelID: number;
   const table: string = "channels";
   const column: string = "channel_name";
 
   try {
     const channelNames = getOnlyChannelNamesNoDuplicates(dataYT);
     await Promise.all(
-      channelNames.map(async ({ channelTitle: channel }, index) => {
+      channelNames.map(async ({ channelName }, index) => {
         const uniquenessValue: number = await checkUniqueness(
           table,
           column,
-          channel,
+          channelName,
         );
-        channel_id = uniquenessValue
+        channelID = uniquenessValue
           ? uniquenessValue
-          : await insertIntoChannelsReturnID(channel);
-        channelNames[index].channel_id = channel_id;
+          : await insertIntoChannelsReturnID(channelName);
+        channelNames[index].channelID = channelID;
       }),
     );
     return channelNames;
@@ -57,13 +57,13 @@ async function insertVideos(
 ) {
   try {
     await Promise.all(
-      dataYT.map(async ({ title, date, channelTitle }) => {
+      dataYT.map(async ({ title, date, channelName }) => {
         const channelNameID = channelNames.find(
-          (item) => item.channelTitle === channelTitle,
+          (item) => item.channelName === channelName,
         );
-        const channel_id = channelNameID?.channel_id;
-        if (channel_id === undefined) return "No channel id found";
-        await insertIntoVideos(title, date, channel_id);
+        const channelID = channelNameID?.channelID;
+        if (channelID === undefined) return "No channel id found";
+        await insertIntoVideos(title, date, channelID);
       }),
     );
   } catch (err) {

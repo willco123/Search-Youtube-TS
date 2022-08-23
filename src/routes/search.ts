@@ -3,9 +3,10 @@ const router = express.Router();
 
 import getSearchResults from "../services/yt-data-api";
 
-router.get("/", async (_req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
-    await getSearchResults();
+    const searchArray: string[] = Object.values(req.body);
+    await getSearchResults(searchArray);
     return res.status(200).send("Items stored in DB!");
   } catch (err: any) {
     if (err.code == 403) {

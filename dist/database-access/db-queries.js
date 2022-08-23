@@ -15,11 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChildItemsWithFK = exports.getParentItemByFK = exports.searchVideosFromDB = exports.searchChannelsFromDB = exports.searchDBFromTable = exports.deleteItemByIDFromTable = exports.getItemByIDFromTable = exports.getAllFromTable = exports.checkUniqueness = exports.insertIntoVideos = exports.insertIntoChannelsReturnID = void 0;
 const db_1 = __importDefault(require("../config/db"));
 const type_guard_helpers_1 = require("../utils/type-guard-helpers");
-function insertIntoChannelsReturnID(channelTitle) {
+function insertIntoChannelsReturnID(channelName) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             let [query] = yield db_1.default.query("INSERT INTO CHANNELS(channel_name)\
-                      VALUES (?)", [channelTitle]);
+                      VALUES (?)", [channelName]);
             const idAlias = query;
             return idAlias.insertId; //fixes trivial type checking error
         }
@@ -108,7 +108,7 @@ function searchDBFromTable(table, column, value) {
 exports.searchDBFromTable = searchDBFromTable;
 function searchChannelsFromDB(column, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = yield db_1.default.query("SELECT * FROM channels WHERE (??) LIKE (?)", [
+        const query = yield db_1.default.query("SELECT * FROM channels WHERE (??) RLIKE (?)", [
             column,
             value,
         ]);
@@ -119,7 +119,7 @@ function searchChannelsFromDB(column, value) {
 exports.searchChannelsFromDB = searchChannelsFromDB;
 function searchVideosFromDB(column, value) {
     return __awaiter(this, void 0, void 0, function* () {
-        const query = yield db_1.default.query("SELECT * FROM videos WHERE (??) LIKE (?)", [
+        const query = yield db_1.default.query("SELECT * FROM videos WHERE (??) RLIKE (?)", [
             column,
             value,
         ]);

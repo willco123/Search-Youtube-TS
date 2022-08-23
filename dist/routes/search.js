@@ -15,9 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 const yt_data_api_1 = __importDefault(require("../services/yt-data-api"));
-router.get("/", (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, yt_data_api_1.default)();
+        const searchArray = Object.values(req.body);
+        yield (0, yt_data_api_1.default)(searchArray);
         return res.status(200).send("Items stored in DB!");
     }
     catch (err) {

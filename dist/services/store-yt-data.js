@@ -13,26 +13,46 @@ exports.storeData = void 0;
 const db_queries_1 = require("../database-access/db-queries");
 function storeData(dataYT) {
     return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const channelNames = yield insertChannel(dataYT);
+            yield insertVideos(dataYT, channelNames);
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
+exports.storeData = storeData;
+function insertChannel(dataYT) {
+    return __awaiter(this, void 0, void 0, function* () {
         let channel_id;
         const table = "channels";
         const column = "channel_name";
         try {
-            const channelNames = getOnlyChannelNamesNoDuplicates(dataYT); //better if we somehow just do datayt.map and then pass in filtered array after, makes more sense
-            console.log(channelNames);
-            yield Promise.all(channelNames.map((channel) => __awaiter(this, void 0, void 0, function* () {
+            const channelNames = getOnlyChannelNamesNoDuplicates(dataYT);
+            yield Promise.all(channelNames.map(({ channelTitle: channel }, index) => __awaiter(this, void 0, void 0, function* () {
+                console.log(channel);
                 const uniquenessValue = yield (0, db_queries_1.checkUniqueness)(table, column, channel);
                 channel_id = uniquenessValue
                     ? uniquenessValue
                     : yield (0, db_queries_1.insertIntoChannelsReturnID)(channel);
-                dataYT.forEach((element, index) => {
-                    //probably slower than doing a simple for loop instead of async db calls, find better way to mutate dataYT.
-                    if (element.channelTitle === channel) {
-                        dataYT[index].channel_id = channel_id;
-                    }
-                });
+                channelNames[index].channel_id = channel_id;
             })));
-            yield Promise.all(dataYT.map(({ title, date, channel_id }) => __awaiter(this, void 0, void 0, function* () {
-                channel_id = channel_id;
+            return channelNames;
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+}
+function insertVideos(dataYT, channelNames) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield Promise.all(dataYT.map(({ title, date, channelTitle }) => __awaiter(this, void 0, void 0, function* () {
+                const channelNameID = channelNames.find((item) => item.channelTitle === channelTitle);
+                const channel_id = channelNameID === null || channelNameID === void 0 ? void 0 : channelNameID.channel_id;
+                if (channel_id === undefined)
+                    return "No channel id found";
                 yield (0, db_queries_1.insertIntoVideos)(title, date, channel_id);
             })));
         }
@@ -41,9 +61,11 @@ function storeData(dataYT) {
         }
     });
 }
-exports.storeData = storeData;
 function getOnlyChannelNamesNoDuplicates(dataYT) {
-    const filteredArray = dataYT.map((item) => item.channelTitle);
-    const setFilteredArray = [...new Set(filteredArray)];
-    return setFilteredArray;
+    const uniqueArr = [...new Set(dataYT.map((item) => item.channelTitle))];
+    const uniqueObjArr = [];
+    for (let i = 0; i < uniqueArr.length; i++) {
+        uniqueObjArr.push({ channelTitle: uniqueArr[i] });
+    }
+    return uniqueObjArr;
 }

@@ -69,7 +69,7 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    multipleStatements: true,
+    multipleStatements: false,
 });
 const promisePool = pool.promise();
 exports.default = promisePool;

@@ -38,7 +38,11 @@ function searchVideos(query) {
             const results = yield (0, db_queries_1.searchVideosFromDB)(column, value);
             const output = [];
             for (let { title: Videos, channel_id: fk, date: UploadDate } of results) {
-                const channelName = yield (0, db_queries_1.getParentItemByFK)("channels", "channel_name", fk);
+                console.log(fk);
+                console.log("here");
+                const channelName = fk === null
+                    ? "Null"
+                    : yield (0, db_queries_1.getParentItemByFK)("channels", "channel_name", fk);
                 output.push({ Channel: channelName, Videos, UploadDate });
             }
             return output;

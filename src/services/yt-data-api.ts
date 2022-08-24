@@ -1,5 +1,6 @@
 import { google } from "googleapis";
 import { storeData } from "./store-yt-data";
+import { dataYT } from "./types";
 
 const apiKey = process.env.MYAPIKEY;
 const youtube = google.youtube({
@@ -11,13 +12,6 @@ let searchParams: any = {
   type: "video",
   maxResults: 50,
 };
-
-interface dataYT {
-  title: string;
-  date: Date;
-  channelName: string;
-  id?: number;
-}
 
 /**
  *All phrases in string have to be in title

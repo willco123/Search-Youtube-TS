@@ -5,17 +5,8 @@ import {
 } from "../database-access/db-queries";
 
 import { getOnlyChannelNamesNoDuplicates } from "../utils/function-helpers";
-interface dataYT {
-  title: string;
-  date: Date;
-  channelName: string;
-  channelID?: number;
-}
+import { dataYT, insertChannelVideos } from "./types";
 
-interface insertChannelVideos {
-  channelName: string;
-  channelID?: number;
-}
 export async function storeData(dataYT: dataYT[]): Promise<void> {
   try {
     const channelNames = await insertChannel(dataYT);

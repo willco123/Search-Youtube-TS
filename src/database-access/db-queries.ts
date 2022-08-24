@@ -1,23 +1,6 @@
 import db from "../config/db";
 import { arrayTypeGuard } from "../utils/type-guard-helpers";
-interface videoResults {
-  id: number;
-  title: string;
-  date: Date;
-  channel_id: number;
-}
-interface channelResults {
-  id: number;
-  channel_name: string;
-}
-
-interface searchResults {
-  id: number;
-  title?: string;
-  date?: Date;
-  channel_name?: string;
-  channel_id?: number;
-}
+import { videoResults, channelResults, searchResults } from "./types";
 
 export async function insertIntoChannelsReturnID(
   channelName: string,
@@ -120,7 +103,7 @@ export async function searchChannelsFromDB(
   column: string,
   value: string,
 ): Promise<channelResults[]> {
-  const query = await db.query("SELECT * FROM channels WHERE (??) RLIKE (?)", [
+  const query = await db.query("SELECT * FROM channels  WHERE (??) RLIKE (?)", [
     column,
     value,
   ]);

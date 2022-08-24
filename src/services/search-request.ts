@@ -4,25 +4,11 @@ import {
   searchVideosFromDB,
   searchChannelsFromDB,
 } from "../database-access/db-queries";
-
-interface channelResults {
-  id: number;
-  titles: string[];
-  channel_name: string;
-}
-
-interface videoResults {
-  id: number;
-  title: string;
-  date: Date;
-  channel_name: string;
-  channel_id: number;
-}
+import { channelResults, videoResults } from "./types";
 
 export async function searchChannels(query: object): Promise<object> {
   try {
     const column = Object.keys(query)[0];
-    // const value = `%${Object.values(query)[0]}%`;
     const searchTerms = Object.values(query)[0].split(" ").join("|");
     const results = await searchChannelsFromDB(column, searchTerms);
     const output: channelResults[] = [];

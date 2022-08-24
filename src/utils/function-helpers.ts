@@ -1,3 +1,5 @@
+import { dataYT, insertChannelVideos } from "./types";
+
 export function checkForQuery(query: object): boolean {
   const isQuery =
     Object.keys(query).length === 0
@@ -6,16 +8,6 @@ export function checkForQuery(query: object): boolean {
       ? false
       : true;
   return isQuery;
-}
-interface dataYT {
-  title: string;
-  date: Date;
-  channelName: string;
-  id?: number;
-}
-interface insertChannelVideos {
-  channelName: string;
-  channelID?: number;
 }
 
 /**

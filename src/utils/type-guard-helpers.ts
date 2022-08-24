@@ -1,14 +1,8 @@
+import { searchResults } from "./types";
+
 export function arrayTypeGuard(query: object) {
   if (Array.isArray(query)) return query[0];
   throw new Error("Array not found");
-}
-
-interface searchResults {
-  id: number;
-  title?: string;
-  date?: Date;
-  channel_name?: string;
-  channel_id?: number;
 }
 
 export function removeNullFromObjectPropsTG(
@@ -25,5 +19,3 @@ export function removeNullFromObjectPropsTG(
 export function isNotNullOrZero<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;
 }
-
-

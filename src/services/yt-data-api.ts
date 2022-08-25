@@ -13,9 +13,6 @@ let searchParams: any = {
   maxResults: 50,
 };
 
-/**
- *All phrases in string have to be in title
- */
 export default async function getSearchResults(searchArray: string[]) {
   for (let i in searchArray) {
     const searchQuery =

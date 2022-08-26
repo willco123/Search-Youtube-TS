@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+
 import {
   getAllFromTable,
   getItemByIDFromTable,
@@ -12,7 +13,6 @@ router.get("/", async (req, res, next) => {
   try {
     const query = req.query;
     const isQuery = checkForQuery(query);
-
     let output: object = isQuery
       ? await searchVideos(query)
       : await getAllFromTable("videos");
@@ -40,6 +40,7 @@ router.get("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   try {
     const id: number = parseInt(req.params.id, 10);
+    if (isNaN(id)) throw new Error("Incorrect Index");
     const deletedItem = await deleteItemByIDFromTable("videos", id);
     return deletedItem
       ? res.status(200).send("Record Successfully deleted")

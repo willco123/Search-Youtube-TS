@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/src/index.js",
   "scripts": {
-    "test": "Jest --runInBand --watchAll --verbose",
+    "test": "Jest --runInBand --watchAll --verbose --coverage",
     "build": "tsc -p tsconfig.build.json"
   },
   "repository": {

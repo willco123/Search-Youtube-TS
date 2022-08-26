@@ -11,7 +11,7 @@ import { checkForQuery } from "../utils/function-helpers";
 
 router.get("/", async (req, res, next) => {
   try {
-    let query = req.query;
+    const query = req.query;
     const isQuery = checkForQuery(query);
     let output: object = isQuery
       ? await searchChannels(query)
@@ -25,7 +25,6 @@ router.get("/", async (req, res, next) => {
 });
 
 router.get("/:id", async (req, res, next) => {
-  //Returns JSON
   try {
     const id: number = parseInt(req.params.id, 10);
     if (isNaN(id)) throw new Error("Incorrect Index");
@@ -41,6 +40,7 @@ router.get("/:id", async (req, res, next) => {
 router.delete("/:id", async (req, res, next) => {
   try {
     const id: number = parseInt(req.params.id, 10);
+    if (isNaN(id)) throw new Error("Incorrect Index");
     const deletedItem = await deleteItemByIDFromTable("channels", id);
     return deletedItem
       ? res.status(200).send("Record Successfully deleted")
@@ -49,6 +49,4 @@ router.delete("/:id", async (req, res, next) => {
     next(err);
   }
 });
-module.exports = router;
-
 export default router;

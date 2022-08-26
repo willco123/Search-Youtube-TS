@@ -103,7 +103,7 @@ describe("VIDEOS", () => {
     });
   });
   describe("DELETE", () => {
-    it("Should do something", async () => {
+    it("Should return Incorrect Index", async () => {
       const response = await supertest(app).delete("/videos/a");
       expect(response.statusCode).toBe(500);
       expect(response.text.includes("Incorrect Index"));

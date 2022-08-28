@@ -25,14 +25,6 @@ let myMock: jest.SpyInstance;
 const app = setUpMockApp();
 app.use("/videos", router);
 
-beforeAll(async () => {
-  await useTestDB();
-});
-
-afterAll(async () => {
-  await endDB();
-});
-
 describe("VIDEOS", () => {
   describe("GET", () => {
     it("Should call getAllFromTable", async () => {

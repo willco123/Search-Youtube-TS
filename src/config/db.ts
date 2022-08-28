@@ -41,6 +41,5 @@ const pool = mysql.createPool({
   multipleStatements: false,
 });
 
-const promisePool = pool.promise();
-
+let promisePool = pool.promise();
 export default promisePool;

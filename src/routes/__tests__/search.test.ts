@@ -6,10 +6,6 @@ import * as getSearchResults from "../../services/yt-data-api";
 const app = setUpMockApp();
 app.use("/search", router);
 
-beforeAll(async () => {
-  await useTestDB();
-});
-
 let myMock: jest.SpyInstance;
 myMock = jest.spyOn(getSearchResults, "default");
 
@@ -42,8 +38,4 @@ describe("SEARCH", () => {
       expect(response.status).toBe(500);
     });
   });
-});
-
-afterAll(async () => {
-  await endDB();
 });

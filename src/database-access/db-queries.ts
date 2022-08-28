@@ -21,13 +21,13 @@ export async function insertIntoChannelsReturnID(
 export async function insertIntoVideos(
   title: string,
   date: Date,
-  id: number,
+  channel_id: number,
 ): Promise<void> {
   try {
     await db.query(
       "INSERT INTO VIDEOS(title, date, channel_id)\
                     VALUES (?,?,?)",
-      [title, date, id],
+      [title, date, channel_id],
     );
   } catch (err) {
     throw err;

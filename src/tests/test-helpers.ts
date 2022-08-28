@@ -2,6 +2,12 @@ import "dotenv/config";
 import express from "express";
 import db from "../config/db";
 import { arrayTypeGuard } from "../utils/type-guard-helpers";
+export interface testDataYT {
+  title: string;
+  date: Date;
+  channel_name: string;
+  id?: number;
+}
 
 export function setUpMockApp() {
   const app = express();
@@ -13,24 +19,24 @@ export function testFunc() {
   return "hey";
 }
 
-export function createMockData() {
-  let mockData = {
-    mockData1: {
+export function createMockData(): testDataYT[] {
+  let mockData = [
+    {
       title: "Title One",
       date: new Date("2022-01-01"),
-      channelTitle: "Channel One",
+      channel_name: "Channel One",
     },
-    mockData2: {
+    {
       title: "Title Two",
       date: new Date("2022-02-02"),
-      channelTitle: "Channel Two",
+      channel_name: "Channel Two",
     },
-    mockData3: {
+    {
       title: "Title Three",
       date: new Date("2022-03-03"),
-      channelTitle: "Channel Three",
+      channel_name: "Channel Three",
     },
-  };
+  ];
 
   return mockData;
 }
@@ -70,4 +76,21 @@ export async function useTestDB() {
 
 export async function endDB() {
   await db.end();
+}
+
+export async function populateDB(mockData: testDataYT[]) {
+  await Promise.all(
+    mockData.map(async (item) => {
+      const [query] = await db.query(
+        "INSERT INTO channels (channel_name) VALUES (?)",
+        [item.channel_name],
+      );
+      const idAlias: any = query;
+      const channel_id = idAlias.insertId;
+      await db.query(
+        "INSERT INTO videos (title, date, channel_id) VALUES (?,?,?)",
+        [item.title, item.date, channel_id],
+      );
+    }),
+  );
 }

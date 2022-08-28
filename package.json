@@ -2,7 +2,7 @@
   "name": "youtubesearch",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "Jest --runInBand --watchAll --verbose --coverage",
     "build": "tsc -p tsconfig.build.json"

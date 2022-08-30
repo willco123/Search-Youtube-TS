@@ -1,11 +1,9 @@
-import "dotenv/config";
 import express from "express";
-import db from "../config/db";
-import { arrayTypeGuard } from "../utils/type-guard-helpers";
-export interface testDataYT {
+
+export interface dataYT {
   title: string;
   date: Date;
-  channel_name: string;
+  channelName: string;
   id?: number;
 }
 
@@ -19,78 +17,52 @@ export function testFunc() {
   return "hey";
 }
 
-export function createMockData(): testDataYT[] {
+export function createMockData(): dataYT[] {
   let mockData = [
     {
       title: "Title One",
       date: new Date("2022-01-01"),
-      channel_name: "Channel One",
+      channelName: "Channel One",
     },
     {
       title: "Title Two",
       date: new Date("2022-02-02"),
-      channel_name: "Channel Two",
+      channelName: "Channel Two",
     },
     {
       title: "Title Three",
       date: new Date("2022-03-03"),
-      channel_name: "Channel Three",
+      channelName: "Channel Three",
     },
   ];
 
   return mockData;
 }
 
-export async function clearDB() {
-  await db.query("delete from videos;");
-  await db.query("delete from channels;");
-}
-
-export async function getFirstVideo() {
-  const query = await db.query("Select * from videos;");
-  const items = arrayTypeGuard(query);
-  const firstItemID: any = items[0][0].id;
-  return firstItemID;
-}
-
-export async function getFirstChannel() {
-  const query = await db.query("Select * from channels;");
-  const items = arrayTypeGuard(query);
-  const firstItemID = items[0][0].id;
-  return firstItemID;
-}
-
-export async function getAllChannels() {
-  const items = await db.query("select * from channels;");
-  return items[0];
-}
-
-export async function getAllVideos() {
-  const items = await db.query("select * from videos;");
-  return items[0];
-}
-
-export async function useTestDB() {
-  await db.query("use ytsearchDB_test");
-}
-
-export async function endDB() {
-  await db.end();
-}
-
-export async function populateDB(mockData: testDataYT[]) {
-  await Promise.all(
-    mockData.map(async (item) => {
-      const [query] = await db.query(
-        "INSERT INTO channels (channel_name) VALUES (?)",
-        [item.channel_name],
-      );
-      const idAlias: any = query;
-      const channel_id = idAlias.insertId;
-      await db.query(
-        "INSERT INTO videos (title, date, channel_id) VALUES (?,?,?)",
-        [item.title, item.date, channel_id],
-      );
-    }),
-  );
+export function createMockYtData() {
+  let mockData = [
+    {
+      snippet: {
+        title: "Title One",
+        publishedAt: "2020-01-31T18:09:23Z",
+        channelTitle: "Channel One",
+      },
+    },
+    {
+      snippet: {
+        title: "Title Two",
+        publishedAt: "2021-01-31T18:09:23Z",
+        channelTitle: "Channel Two",
+      },
+    },
+    {
+      snippet: {
+        title: "Title Three",
+        publishedAt: "2022-01-31T18:09:23Z",
+        channelTitle: "Channel Three",
+      },
+    },
+    ,
+  ];
+  return mockData;
 }

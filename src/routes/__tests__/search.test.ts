@@ -1,13 +1,18 @@
+import "dotenv/config"
 import supertest from "supertest";
-import { setUpMockApp, useTestDB, endDB } from "../../tests/test-helpers";
+import { setUpMockApp } from "../../tests/test-helpers";
 import router from "../search";
 import * as getSearchResults from "../../services/yt-data-api";
 
 const app = setUpMockApp();
 app.use("/search", router);
 
+jest.mock("../../services/yt-data-api");
+
 let myMock: jest.SpyInstance;
-myMock = jest.spyOn(getSearchResults, "default");
+myMock = jest
+  .spyOn(getSearchResults, "default")
+  .mockImplementation((): any => jest.fn());
 
 describe("SEARCH", () => {
   describe("POST", () => {

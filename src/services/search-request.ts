@@ -4,14 +4,19 @@ import {
   searchVideosFromDB,
   searchChannelsFromDB,
 } from "../database-access/db-queries";
-import { channelResults, videoResults } from "./types";
+import {
+  channelResults,
+  videoResults,
+  channelOutput,
+  videoOutput,
+} from "./types";
 
-export async function searchChannels(query: object): Promise<object> {
+export async function searchChannels(query: object): Promise<channelOutput[]> {
   try {
     const column = Object.keys(query)[0];
-    const searchTerms = Object.values(query)[0].split(" ").join("|");
+    const searchTerms = Object.values(query)[0].split(" ").join(".+");
     const results = await searchChannelsFromDB(column, searchTerms);
-    const output: channelResults[] = [];
+    const output: channelOutput[] = [];
 
     for (let { id: fk, channel_name } of results) {
       const videosWithFK = await getChildItemsWithFK("videos", "title", fk);
@@ -27,9 +32,9 @@ export async function searchChannels(query: object): Promise<object> {
 export async function searchVideos(query: object): Promise<object> {
   try {
     const column = Object.keys(query)[0];
-    const value = `%${Object.values(query)[0]}%`;
-    const results = await searchVideosFromDB(column, value);
-    const output: videoResults[] = [];
+    const searchTerms = Object.values(query)[0].split(" ").join(".+");
+    const results = await searchVideosFromDB(column, searchTerms);
+    const output: videoOutput[] = [];
     for (let { id, title, channel_id: fk, date } of results) {
       const channelName =
         fk === null

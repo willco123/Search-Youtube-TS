@@ -53,10 +53,14 @@ export async function checkUniqueness(
   }
 }
 
-export async function getAllFromTable(table: string): Promise<object> {
-  const query = await db.query("SELECT * from ??", [table]);
-  const items: object = query[0];
-  return items;
+export async function getAllFromTable(table: string): Promise<videoResults[]> {
+  try {
+    const query = await db.query("SELECT * from ??", [table]);
+    const items: videoResults[] = arrayTypeGuard(query);
+    return items;
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function getItemByIDFromTable(
@@ -68,7 +72,8 @@ export async function getItemByIDFromTable(
       table,
       id,
     ]);
-    return Array.isArray(query) ? query[0] : 0;
+
+    return arrayTypeGuard(query);
   } catch (err) {
     throw err;
   }
@@ -78,12 +83,16 @@ export async function deleteItemByIDFromTable(
   table: string,
   id: number,
 ): Promise<boolean> {
-  const [deletedItem]: any = await db.query("DELETE FROM ?? WHERE id = (?)", [
-    table,
-    id,
-  ]);
-  if (deletedItem.affectedRows === 0) return false;
-  else return true;
+  try {
+    const [deletedItem]: any = await db.query("DELETE FROM ?? WHERE id = (?)", [
+      table,
+      id,
+    ]);
+    if (deletedItem.affectedRows === 0) return false;
+    else return true;
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function searchDBFromTable(
@@ -91,35 +100,50 @@ export async function searchDBFromTable(
   column: string,
   value: string,
 ): Promise<searchResults[]> {
-  const query = await db.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
-    table,
-    column,
-    value,
-  ]);
-  const results: searchResults[] = arrayTypeGuard(query);
-  return results;
+  try {
+    const query = await db.query("SELECT * FROM ?? WHERE (??) LIKE (?)", [
+      table,
+      column,
+      value,
+    ]);
+    const results: searchResults[] = arrayTypeGuard(query);
+    return results;
+  } catch (err) {
+    throw err;
+  }
 }
+
 export async function searchChannelsFromDB(
   column: string,
   value: string,
 ): Promise<channelResults[]> {
-  const query = await db.query("SELECT * FROM channels  WHERE (??) RLIKE (?)", [
-    column,
-    value,
-  ]);
-  const results: channelResults[] = arrayTypeGuard(query);
-  return results;
+  try {
+    const query = await db.query(
+      "SELECT * FROM channels  WHERE (??) RLIKE (?)",
+      [column, value],
+    );
+
+    const results: channelResults[] = arrayTypeGuard(query);
+    return results;
+  } catch (err) {
+    throw err;
+  }
 }
+
 export async function searchVideosFromDB(
   column: string,
   value: string,
 ): Promise<videoResults[]> {
-  const query = await db.query("SELECT * FROM videos WHERE (??) RLIKE (?)", [
-    column,
-    value,
-  ]);
-  const results: videoResults[] = arrayTypeGuard(query);
-  return results;
+  try {
+    const query = await db.query("SELECT * FROM videos WHERE (??) RLIKE (?)", [
+      column,
+      value,
+    ]);
+    const results: videoResults[] = arrayTypeGuard(query);
+    return results;
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function getParentItemByFK(
@@ -127,13 +151,17 @@ export async function getParentItemByFK(
   parentColumn: string,
   fk: number,
 ): Promise<string> {
-  const [query] = await db.query("select (??) from ?? where id = ? ", [
-    parentColumn,
-    parentTable,
-    fk,
-  ]);
-  const parentItem: { [key: string]: string } = arrayTypeGuard(query);
-  return parentItem[parentColumn];
+  try {
+    const [query] = await db.query("select (??) from ?? where id = ? ", [
+      parentColumn,
+      parentTable,
+      fk,
+    ]);
+    const parentItem: { [key: string]: string } = arrayTypeGuard(query);
+    return parentItem[parentColumn];
+  } catch (err) {
+    throw err;
+  }
 }
 
 export async function getChildItemsWithFK(
@@ -141,11 +169,14 @@ export async function getChildItemsWithFK(
   childColumn: string,
   fk: number,
 ) {
-  const [query] = await db.query("select (??) from ?? where channel_id = ? ", [
-    childColumn,
-    childTable,
-    fk,
-  ]);
-  const childItems: any = query;
-  return childItems.map((key: any) => key[childColumn]);
+  try {
+    const [query] = await db.query(
+      "select (??) from ?? where channel_id = ? ",
+      [childColumn, childTable, fk],
+    );
+    const childItems: any = query;
+    return childItems.map((key: any) => key[childColumn]);
+  } catch (err) {
+    throw err;
+  }
 }

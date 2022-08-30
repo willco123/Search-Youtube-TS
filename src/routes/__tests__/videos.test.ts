@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { setUpMockApp, useTestDB, endDB } from "../../tests/test-helpers";
+import { setUpMockApp } from "../../tests/test-helpers";
 import router from "../videos";
 import * as dbQueries from "../../database-access/db-queries";
 import * as searchRequest from "../../services/search-request";

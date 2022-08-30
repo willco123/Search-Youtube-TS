@@ -1,10 +1,10 @@
-export interface channelResults {
+export interface channelOutput {
   id: number;
   titles: string[];
   channel_name: string;
 }
 
-export interface videoResults {
+export interface videoOutput {
   id: number;
   title: string;
   date: Date;
@@ -22,4 +22,15 @@ export interface dataYT {
 export interface insertChannelVideos {
   channelName: string;
   channelID?: number;
+}
+
+export interface videoResults {
+  id: number;
+  title: string;
+  date: Date;
+  channel_id: number;
+}
+export interface channelResults {
+  id: number;
+  channel_name: string;
 }

@@ -1,4 +1,4 @@
-import "dotenv/config"
+import "dotenv/config";
 import supertest from "supertest";
 import { setUpMockApp } from "../../tests/test-helpers";
 import router from "../search";

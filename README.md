@@ -13,7 +13,7 @@ The project requires an instance of MYSQL, the user needs to have privileges to 
 
 Head to https://developers.google.com/youtube/v3/getting-started to grab a Youtube Data API v3 key.
 
-Run nodemon in the root of the project to establish the server and call the following endpoints!
+Compile with "tsc" then run "nodemon" in the root of the project to establish the server and call the following endpoints!
 
 ## /search
 

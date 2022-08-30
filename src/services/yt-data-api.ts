@@ -26,6 +26,7 @@ async function queryYoutube(searchParams: any) {
   try {
     await process.nextTick(() => {});
     let response = await youtube.search.list(searchParams);
+    console.dir(response.data.items);
     if (response.data.pageInfo == undefined) throw new Error("Bad Response");
 
     const totalResults = response.data.pageInfo.totalResults;
